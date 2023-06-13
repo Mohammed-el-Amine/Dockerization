@@ -11,7 +11,9 @@ services:
       - mysql_data:/var/lib/mysql
 
   php:
-    image: php:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/var/www/html
     ports:
