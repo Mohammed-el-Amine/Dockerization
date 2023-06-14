@@ -44,15 +44,15 @@ class HomeController extends AbstractController
 
             if ($user) {
                 if ($this->isPasswordValid($user, $password)) {
-                    $session->set('user_id', $user->getId()); // Stocke l'identifiant de l'utilisateur dans la session
+                    $session->set('user_id', $user->getId()); 
 
                     $role = $user->getRole();
                     if ($role === "admin") {
                         // return $this->redirectToRoute('admin_dashboard');
                         $this->addFlash('success', 'admin');
                     } else if ($role === 'utilisateur') {
-                        // return $this->redirectToRoute('user_profile');
-                        $this->addFlash('success', 'utilisateur');
+                        return $this->redirectToRoute('profile_signature');
+                        // $this->addFlash('success', 'utilisateur');
                     }
                 } else {
                     $this->addFlash('danger', 'Mot de passe invalide');
