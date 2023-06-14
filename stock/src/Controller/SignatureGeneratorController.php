@@ -95,7 +95,7 @@ class SignatureGeneratorController extends AbstractController
             ->add('logo', EntityType::class, [
                 'label' => 'Logo : ',
                 'class' => Logo::class,
-                'choice_label' => 'path',
+                'choice_label' => 'name',
                 'required' => false,
             ])
             ->getForm();
@@ -117,6 +117,7 @@ class SignatureGeneratorController extends AbstractController
             $signature->setPhone($data['phone']);
             $signature->setLogo($data['logo']);
             $signature->setUserId($session->get('user_id'));
+
 
             $createAt = new DateTimeImmutable();
             $signature->setCreateAt($createAt);

@@ -3,7 +3,7 @@
 {% block title %}Générer une signature{% endblock %}
 
 {% block body %}
-    <button href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</button>
+    <a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
 
     <div class="generateur">
         <section class="generate_signature" style="width: 33%; float: left;">
@@ -47,13 +47,13 @@
         </section>
 
        <section class="view_signature" style="width: 60%; float: right; padding-top: 12%;">
-            <div class="prévisualisation">
+            <div class="prévisualisation" style="border: solid;">
                 <table border="0" cellpadding="0" width="500">
                     <tbody>
                         <tr>
                             <td align="left" valign="middle" width="10">
                                 <p>
-                                    <a id="logo" href="${logoPath}"><img id="logo" src="${logoPath}" style="border: none;width: 400px;"></a>
+                                    <a href="https://www.unsa.org/"><img id="logo" src="${logoPath}" style="border: none;width: 120px; " alt="LOGO UNSA"></a>
                                 </p>
                             </td>
                             <td>
@@ -65,7 +65,7 @@
                                 <p>
                                     <span id="address">${address}</span><br>
                                     <span id="zipCode">${zipCode}&nbsp;</span>
-                                    <span id="city">${city}</span><br>
+                                    <span id="city">${city} CEDEX</span><br>
                                 </p>
                                 <p>
                                     <img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;height: 12px;margin-right: .5em;">
@@ -91,12 +91,38 @@
     function updatePreview() {
         // Sélectionnez l'élément de prévisualisation "name"
         var previewName = document.getElementById('name');
+        var previewEmail = document.getElementById('email');
+
+        var previewLogo = document.getElementById('logo'); //je recupere l'id et non le path
+
+        var previewOrganization = document.getElementById('organization');
+        var previewRole = document.getElementById('role');
+        var previewAdress = document.getElementById('address');
+        var previewZipCode = document.getElementById('zipCode');
+        var previewCity = document.getElementById('city');
+        var previewPhone = document.getElementById('phone');
 
         // Sélectionnez la valeur du champ "name"
         var nameValue = document.getElementById('form_name').value;
+        var emailValue = document.getElementById('form_email').value;
+        var logoValue = document.getElementById('form_logo').value;
+        var organizationValue = document.getElementById('form_organization').value;
+        var roleValue = document.getElementById('form_role').value;
+        var addressValue = document.getElementById('form_adress').value;
+        var cityValue = document.getElementById('form_city').value;
+        var phoneValue = document.getElementById('form_phone').value;
+        var zipCodeValue = document.getElementById('form_zip_code').value;
 
         // Mettez à jour le contenu de la prévisualisation avec la valeur du champ "name"
         previewName.textContent = nameValue;
+        previewEmail.textContent = emailValue;
+        previewLogo.src = logoValue; 
+        previewOrganization.textContent = organizationValue;
+        previewRole.textContent = roleValue;
+        previewAdress.textContent = addressValue
+        previewCity.textContent = cityValue;
+        previewPhone.textContent = phoneValue;
+        previewZipCode.textContent= zipCodeValue;
     }
 </script>
 
