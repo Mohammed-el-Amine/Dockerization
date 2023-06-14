@@ -3,7 +3,7 @@
 {% block title %}Générer une signature{% endblock %}
 
 {% block body %}
-    <a href="{{ path('logout') }}">Déconnexion</a>
+    <button href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</button>
 
     <div class="generateur">
         <section class="generate_signature" style="width: 33%; float: left;">
@@ -13,31 +13,31 @@
             <form class="form" method="post">
                 {{ form_start(form) }}
                     <div class="form-group">
-                        {{ form_row(form.name, {'attr': {'class': 'form-control', 'id': 'form_name'}}) }}
+                        {{ form_row(form.name, {'attr': {'class': 'form-control', 'id': 'form_name', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.email, {'attr': {'class': 'form-control', 'id': 'form_email'}}) }}
+                        {{ form_row(form.email, {'attr': {'class': 'form-control', 'id': 'form_email', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.phone, {'attr': {'class': 'form-control', 'id': 'form_phone'}}) }}
+                        {{ form_row(form.phone, {'attr': {'class': 'form-control', 'id': 'form_phone', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.role, {'attr': {'class': 'form-control', 'id': 'form_role'}}) }}
+                        {{ form_row(form.role, {'attr': {'class': 'form-control', 'id': 'form_role', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.organization, {'attr': {'class': 'form-control', 'id': 'form_organization'}}) }}
+                        {{ form_row(form.organization, {'attr': {'class': 'form-control', 'id': 'form_organization', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.adress, {'attr': {'class': 'form-control', 'id': 'form_address'}}) }}
+                        {{ form_row(form.adress, {'attr': {'class': 'form-control', 'id': 'form_address', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.zip_code, {'attr': {'class': 'form-control', 'id': 'form_zip_code'}}) }}
+                        {{ form_row(form.zip_code, {'attr': {'class': 'form-control', 'id': 'form_zip_code', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.city, {'attr': {'class': 'form-control', 'id': 'form_city'}}) }}
+                        {{ form_row(form.city, {'attr': {'class': 'form-control', 'id': 'form_city', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     <div class="form-group">
-                        {{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo'}}) }}
+                        {{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     {# Ajouter du JavaScript ici pour afficher les images #}
 
@@ -53,25 +53,25 @@
                         <tr>
                             <td align="left" valign="middle" width="10">
                                 <p>
-                                    <a href="https://www.unsa.org"><img src="${logoPath}" style="border: none;width: 400px;"></a>
+                                    <a id="logo" href="${logoPath}"><img id="logo" src="${logoPath}" style="border: none;width: 400px;"></a>
                                 </p>
                             </td>
                             <td>
                                 <p>
-                                    <span>${name}</span><br>
-                                    <span><i>${role}</i></span><br>
-                                    <span><i>${organization}</i></span><br>
+                                    <span id="name">${name}</span><br>
+                                    <span id ="role"><i>${role}</i></span><br>
+                                    <span id="organization"><i>${organization}</i></span><br>
                                 </p>
                                 <p>
-                                    <span>${address}</span><br>
-                                    <span>${zipCode}&nbsp;</span>
-                                    <span>${city}</span><br>
+                                    <span id="address">${address}</span><br>
+                                    <span id="zipCode">${zipCode}&nbsp;</span>
+                                    <span id="city">${city}</span><br>
                                 </p>
                                 <p>
                                     <img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;height: 12px;margin-right: .5em;">
-                                    <a href="mailto:${email}" style="color: #666;font-style: italic;">${email}</a><br>
+                                    <a id="email" href="mailto:${email}" style="color: #666;font-style: italic;">${email}</a><br>
                                     <img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;height: 14px;margin-right: .5em;">
-                                    <span style="color: #666;">${phone}</span>
+                                    <span id="phone" style="color: #666;">${phone}</span>
                                 </p>
                             </td>
                         </tr>
@@ -79,7 +79,25 @@
                 </table>
             </div>
         </section>
-    <div style="clear: both;"></div>
+
+        <div style="clear: both;"></div>
     </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+
+<script>
+    function updatePreview() {
+        // Sélectionnez l'élément de prévisualisation "name"
+        var previewName = document.getElementById('name');
+
+        // Sélectionnez la valeur du champ "name"
+        var nameValue = document.getElementById('form_name').value;
+
+        // Mettez à jour le contenu de la prévisualisation avec la valeur du champ "name"
+        previewName.textContent = nameValue;
+    }
+</script>
 
 {% endblock %}
