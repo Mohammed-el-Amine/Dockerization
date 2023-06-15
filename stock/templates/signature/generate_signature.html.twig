@@ -40,11 +40,11 @@
                         {{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo', 'oninput': 'updatePreview()'}}) }}
                     </div>
                     {# Ajouter du JavaScript ici pour afficher les images #}
-
                     <button type="submit" class="btn btn-primary">Générer</button>
                 {{ form_end(form) }}
             </form>
         </section>
+        
 
        <section class="view_signature" style="width: 60%; float: right; padding-top: 12%;">
             <div class="prévisualisation" style="border: solid;">
@@ -53,7 +53,7 @@
                         <tr>
                             <td align="left" valign="middle" width="10">
                                 <p>
-                                    <a href="https://www.unsa.org/"><img id="logo" src="${logoPath}" style="border: none;width: 120px; " alt="LOGO UNSA"></a>
+                                    <a href="https://www.unsa.org/"><img id="logo" src='${logo}' style="border: none;width: 120px; " alt="LOGO UNSA"></a>
                                 </p>
                             </td>
                             <td>
@@ -92,9 +92,7 @@
         // Sélectionnez l'élément de prévisualisation "name"
         var previewName = document.getElementById('name');
         var previewEmail = document.getElementById('email');
-
-        var previewLogo = document.getElementById('logo'); //je recupere l'id et non le path
-
+        var previewLogo = document.getElementById('logo'); 
         var previewOrganization = document.getElementById('organization');
         var previewRole = document.getElementById('role');
         var previewAdress = document.getElementById('address');
@@ -105,7 +103,11 @@
         // Sélectionnez la valeur du champ "name"
         var nameValue = document.getElementById('form_name').value;
         var emailValue = document.getElementById('form_email').value;
-        var logoValue = document.getElementById('form_logo').value;
+        // probleme de logo corriger , recuperation du name a la selection et utilisation du path pour l'afficher l'image
+        var logoSelect = document.getElementById('form_logo');
+        var selectedOption = logoSelect.options[logoSelect.selectedIndex];
+        var logoValue = selectedOption.getAttribute('name');
+
         var organizationValue = document.getElementById('form_organization').value;
         var roleValue = document.getElementById('form_role').value;
         var addressValue = document.getElementById('form_adress').value;
@@ -120,10 +122,25 @@
         previewOrganization.textContent = organizationValue;
         previewRole.textContent = roleValue;
         previewAdress.textContent = addressValue
-        previewCity.textContent = cityValue;
+        previewCity.textContent = cityValue + " CEDEX";
         previewPhone.textContent = phoneValue;
         previewZipCode.textContent= zipCodeValue;
+
+
+
+        var selectElement = document.getElementById('form_logo');
+var optionNames = [];
+
+var options = selectElement.getElementsByTagName('option');
+for (var i = 0; i < options.length; i++) {
+  var option = options[i];
+  optionNames.push(option.getAttribute('name'));
+}
+
+//console.log(optionNames);
     }
+
+    
 </script>
 
 {% endblock %}

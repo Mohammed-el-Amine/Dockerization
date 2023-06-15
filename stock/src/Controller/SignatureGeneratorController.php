@@ -14,6 +14,7 @@ use DateTimeImmutable;
 use App\Entity\Logo;
 use App\Entity\Signature;
 use App\Repository\UserRepository;
+use App\Repository\LogoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -29,7 +30,7 @@ class SignatureGeneratorController extends AbstractController
     }
 
     #[Route('/signature', name: 'profile_signature')]
-    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository): Response
+    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, LogoRepository $logoRepository): Response
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
@@ -42,6 +43,15 @@ class SignatureGeneratorController extends AbstractController
         } else {
             throw $this->createAccessDeniedException('Access Denied');
         }
+
+        $logos = $logoRepository->findAll();
+$logoChoices = [];
+
+foreach ($logos as $logo) {
+    $name = $logo->getName();
+    $path = $logo->getPath();
+    $logoChoices[$name] = $logo;
+}
 
         $form = $this->createFormBuilder()
             ->add('name', TextType::class, [
@@ -96,13 +106,17 @@ class SignatureGeneratorController extends AbstractController
                 'label' => 'Logo : ',
                 'class' => Logo::class,
                 'choice_label' => 'name',
+                'choice_attr' => function ($key) {
+                    return ['name' => $key->getPath()];
+                },
+                'choices' => $logoChoices,
                 'required' => false,
             ])
             ->getForm();
 
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() ) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
             // Créer une instance de l'entité Signature et définir les valeurs des propriétés
@@ -118,7 +132,6 @@ class SignatureGeneratorController extends AbstractController
             $signature->setLogo($data['logo']);
             $signature->setUserId($session->get('user_id'));
 
-
             $createAt = new DateTimeImmutable();
             $signature->setCreateAt($createAt);
 
@@ -132,6 +145,7 @@ class SignatureGeneratorController extends AbstractController
 
             // Générer la signature avec les données fournies
             $generatedSignature = $this->generateEmailSignature($data);
+
 
             return $this->render('signature/show_signature.html.twig', [
                 'signature' => $generatedSignature,
