@@ -6,7 +6,7 @@
     <a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
 
     <div class="generateur">
-        <section class="generate_signature" style="width: 33%; float: left;">
+        <section class="generate_signature" style="inline-size: 33%; float: inline-start;">
 
             <h1>Générer une signature</h1>
 
@@ -46,32 +46,32 @@
         </section>
         
 
-       <section class="view_signature" style="width: 60%; float: right; padding-top: 12%;">
+       <section class="view_signature" style="inline-size: 60%; float: inline-end; padding-block-start: 12%;">
             <div class="prévisualisation" style="border: solid;">
                 <table border="0" cellpadding="0" width="500">
                     <tbody>
                         <tr>
                             <td align="left" valign="middle" width="10">
                                 <p>
-                                    <a href="https://www.unsa.org/"><img id="logo" src='${logo}' style="border: none;width: 120px; " alt="LOGO UNSA"></a>
+                                    <a href="https://www.unsa.org/"><img id="logo" src='${logo}' style="border: none;inline-size: 120px; " alt="LOGO UNSA"></a>
                                 </p>
                             </td>
                             <td>
                                 <p>
-                                    <span id="name">${name}</span><br>
-                                    <span id ="role"><i>${role}</i></span><br>
-                                    <span id="organization"><i>${organization}</i></span><br>
+                                    <span id="name">Nom et Prénom</span><br>
+                                    <span id ="role"><i>Mon poste</i></span><br>
+                                    <span id="organization"><i>Mon entreprise</i></span><br>
                                 </p>
                                 <p>
-                                    <span id="address">${address}</span><br>
-                                    <span id="zipCode">${zipCode}&nbsp;</span>
-                                    <span id="city">${city} CEDEX</span><br>
+                                    <span id="address">Mon adresse</span><br>
+                                    <span id="zipCode">Code postal&nbsp;</span>
+                                    <span id="city">Ville CEDEX</span><br>
                                 </p>
                                 <p>
-                                    <img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;height: 12px;margin-right: .5em;">
-                                    <a id="email" href="mailto:${email}" style="color: #666;font-style: italic;">${email}</a><br>
-                                    <img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;height: 14px;margin-right: .5em;">
-                                    <span id="phone" style="color: #666;">${phone}</span>
+                                    <img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;block-size: 12px;margin-inline-end: .5em;">
+                                    <a id="email" href="mailto:${email}" style="color: #666;font-style: italic;">Adresse Email</a><br>
+                                    <img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;block-size: 14px;margin-inline-end: .5em;">
+                                    <span id="phone" style="color: #666;">Numéro</span>
                                 </p>
                             </td>
                         </tr>
@@ -103,8 +103,7 @@
         // Sélectionnez la valeur du champ "name"
         var nameValue = document.getElementById('form_name').value;
         var emailValue = document.getElementById('form_email').value;
-        // probleme de logo corriger , recuperation du name a la selection et utilisation du path pour l'afficher l'image
-        var logoSelect = document.getElementById('form_logo');
+        var logoSelect = document.getElementById('form_logo');// probleme de logo corriger , recuperation du name a la selection et utilisation du path pour l'afficher l'image
         var selectedOption = logoSelect.options[logoSelect.selectedIndex];
         var logoValue = selectedOption.getAttribute('name');
 
@@ -126,18 +125,6 @@
         previewPhone.textContent = phoneValue;
         previewZipCode.textContent= zipCodeValue;
 
-
-
-        var selectElement = document.getElementById('form_logo');
-var optionNames = [];
-
-var options = selectElement.getElementsByTagName('option');
-for (var i = 0; i < options.length; i++) {
-  var option = options[i];
-  optionNames.push(option.getAttribute('name'));
-}
-
-//console.log(optionNames);
     }
 
     

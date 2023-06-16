@@ -169,12 +169,12 @@ foreach ($logos as $logo) {
         $html .= '<tbody>';
         $html .= '<tr>';
         $html .= '<td align="left" valign="middle" width="10">';
-        $html .= '<p style="padding-right: 10px;font-size: 12px;line-height: 14px;">';
-        $html .= '<a href="https://www.unsa.org"><img src="' . $data['logo']->getPath() . '" style="border: none;width: 120px;"></a>';
+        $html .= '<p style="padding-inline-end: 10px;font-size: 12px;line-height: 14px;">';
+        $html .= '<a href="https://www.unsa.org"><img src="' . $data['logo']->getPath() . '" style="border: none;inline-size: 120px;"></a>';
         $html .= '</p>';
         $html .= '</td>';
         $html .= '<td>';
-        $html .= '<p style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;font-size: 12px; line-height: 14px; color: #000;text-align: left;">';
+        $html .= '<p style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;font-size: 12px; line-height: 14px; color: #000;text-align: start;">';
         $html .= '<span style="color: #000;font-weight: bold;font-size: 14px;">' . $data['name'] . '</span><br>';
         $html .= '<span style="color: #666;"><i>' . $data['role'] . '</i></span><br>';
         $html .= '<span style="color: #666;"><i>' . $data['organization'] . '</i></span><br>';
@@ -185,9 +185,9 @@ foreach ($logos as $logo) {
         $html .= '<span style="color: #000;">' . $data['city'] . '</span><br>';
         $html .= '</p>';
         $html .= '<p style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;font-size: 12px; line-height: 14px; color: #000;">';
-        $html .= '<img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;height: 12px;margin-right: .5em;">';
+        $html .= '<img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;block-size: 12px;margin-inline-end: .5em;">';
         $html .= '<a href="mailto:' . $data['email'] . '" style="color: #666;font-style: italic;">' . $data['email'] . '</a><br>';
-        $html .= '<img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;height: 14px;margin-right: .5em;">';
+        $html .= '<img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;block-size: 14px;margin-inline-end: .5em;">';
         $html .= '<span style="color: #666;">' . $data['phone'] . '</span>';
         $html .= '</p>';
         $html .= '</td>';
