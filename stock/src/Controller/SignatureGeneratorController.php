@@ -45,13 +45,13 @@ class SignatureGeneratorController extends AbstractController
         }
 
         $logos = $logoRepository->findAll();
-$logoChoices = [];
+        $logoChoices = [];
 
-foreach ($logos as $logo) {
-    $name = $logo->getName();
-    $path = $logo->getPath();
-    $logoChoices[$name] = $logo;
-}
+        foreach ($logos as $logo) {
+            $name = $logo->getName();
+            $path = $logo->getPath();
+            $logoChoices[$name] = $logo;
+        }
 
         $form = $this->createFormBuilder()
             ->add('name', TextType::class, [
@@ -116,6 +116,8 @@ foreach ($logos as $logo) {
 
         $form->handleRequest($request);
 
+        $generatedSignature = '';
+
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
@@ -145,15 +147,11 @@ foreach ($logos as $logo) {
 
             // Générer la signature avec les données fournies
             $generatedSignature = $this->generateEmailSignature($data);
-
-
-            return $this->render('signature/show_signature.html.twig', [
-                'signature' => $generatedSignature,
-            ]);
         }
 
         return $this->render('signature/generate_signature.html.twig', [
             'form' => $form->createView(),
+            'signature' => $generatedSignature,
         ]);
     }
     private function generateEmailSignature(array $data): string

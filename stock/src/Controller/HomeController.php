@@ -44,7 +44,7 @@ class HomeController extends AbstractController
 
             if ($user) {
                 if ($this->isPasswordValid($user, $password)) {
-                    $session->set('user_id', $user->getId()); 
+                    $session->set('user_id', $user->getId());
 
                     $role = $user->getRole();
                     if ($role === "admin") {
@@ -68,13 +68,12 @@ class HomeController extends AbstractController
     }
 
     private function isPasswordValid(User $user, string $password): bool
-{
-    $hashedPassword = $user->getPassword();
+    {
+        $hashedPassword = $user->getPassword();
 
-    // Hachage du mot de passe fourni avec la fonction SHA2() de MySQL
-    $hashedPasswordInput = hash('sha256', $password);
+        // Hachage du mot de passe fourni avec la fonction SHA2() de MySQL
+        $hashedPasswordInput = hash('sha256', $password);
 
-    return $hashedPassword === $hashedPasswordInput;
-}
-
+        return $hashedPassword === $hashedPasswordInput;
+    }
 }
