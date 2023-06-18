@@ -15,10 +15,15 @@ use App\Entity\Logo;
 use App\Entity\Signature;
 use App\Repository\UserRepository;
 use App\Repository\LogoRepository;
+use App\Repository\SignatureRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Knp\Component\Pager\PaginatorInterface;
+use Knp\Component\Pager\Pagination\SlidingPagination;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+
 
 class SignatureGeneratorController extends AbstractController
 {
@@ -30,7 +35,7 @@ class SignatureGeneratorController extends AbstractController
     }
 
     #[Route('/signature', name: 'profile_signature')]
-    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, LogoRepository $logoRepository): Response
+    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, LogoRepository $logoRepository ,SignatureRepository $signatureRepository,PaginatorInterface $paginator): Response
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
@@ -149,9 +154,28 @@ class SignatureGeneratorController extends AbstractController
             $generatedSignature = $this->generateEmailSignature($data);
         }
 
+        // Récupérer les signatures de l'utilisateur connecté  
+        $page = $request->query->getInt('page', 1);
+        // Nombre d'éléments par page
+        $itemsPerPage = 10;
+    
+        // Récupérer toutes les signatures
+        $allSignatureQuery = $signatureRepository->createQueryBuilder('s')
+            ->getQuery();
+    
+        // Paginer les signatures
+        /** @var PaginationInterface|SlidingPagination $pagination */
+        $pagination = $paginator->paginate(
+            $allSignatureQuery,
+            $page,
+            $itemsPerPage
+        );
+
+
         return $this->render('signature/generate_signature.html.twig', [
             'form' => $form->createView(),
             'signature' => $generatedSignature,
+            'pagination' => $pagination,
         ]);
     }
     private function generateEmailSignature(array $data): string
@@ -206,5 +230,14 @@ class SignatureGeneratorController extends AbstractController
     {
         $session->invalidate();
         return new RedirectResponse($urlGenerator->generate('app_home'));
+    }
+
+    /**
+     * @Route("/signature", name="signature")
+     */
+    public function getSignature(SignatureRepository $signatureRepository){
+        $allSignature = $signatureRepository->findAll();
+        return $this->render('signature/generate_signature.html.twig', [
+        ]);        
     }
 }

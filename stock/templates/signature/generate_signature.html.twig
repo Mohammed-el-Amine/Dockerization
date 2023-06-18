@@ -7,6 +7,39 @@
 	<a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
 
 	<div class="generateur">
+
+<section class="all_signatures">
+   <table class="table">
+      <thead>
+         <tr>
+            <th>Nom et Prénom</th>
+            <th>Date de création</th>
+            <th>Actions</th>
+         </tr>
+      </thead>
+      <tbody>
+         {% for signature in pagination %}
+         <tr>
+            <td>{{ signature.name }}</td>
+            <td>{{ signature.createAT|date('d-m-Y H:i') }}</td>
+            <td>
+               <button class="btn btn-warning" onclick="">Éditer</button>
+               <button class="btn btn-secondary" onclick="">HTML</button>
+               <button class="btn btn-success" onclick="">PNG</button>
+            </td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+
+   {# Afficher les liens de pagination #}
+    <div class="pagination">
+    	{{ knp_pagination_render(pagination) }}
+	</div>
+
+</section>
+
+
 		<section class="generate_signature" style="inline-size: 33%; float: inline-start;">
 
 			<h1>Générer une signature</h1>
