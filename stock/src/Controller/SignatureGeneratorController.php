@@ -35,7 +35,7 @@ class SignatureGeneratorController extends AbstractController
     }
 
     #[Route('/signature', name: 'profile_signature')]
-    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, LogoRepository $logoRepository ,SignatureRepository $signatureRepository,PaginatorInterface $paginator): Response
+    public function generateSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UrlGeneratorInterface $urlGenerator, UserRepository $userRepository, LogoRepository $logoRepository, SignatureRepository $signatureRepository, PaginatorInterface $paginator): Response
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
@@ -154,15 +154,42 @@ class SignatureGeneratorController extends AbstractController
             $generatedSignature = $this->generateEmailSignature($data);
         }
 
-        // Récupérer les signatures de l'utilisateur connecté  
+        $date = $request->query->get('date');
+        $nom = $request->query->get('nom');
+        $poste = $request->query->get('poste');
+
+        // Récupérer les signatures de l'utilisateur connecté
         $page = $request->query->getInt('page', 1);
         // Nombre d'éléments par page
-        $itemsPerPage = 10;
-    
-        // Récupérer toutes les signatures
-        $allSignatureQuery = $signatureRepository->createQueryBuilder('s')
-            ->getQuery();
-    
+        $itemsPerPage = 7;
+
+        // Récupérer toutes les signatures avec les conditions de recherche
+        $signatureQuery = $signatureRepository->createQueryBuilder('s');
+
+        if ($date) {
+            $startDate = new \DateTime($date);
+            $endDate = clone $startDate;
+            // Ajouter 1 jour à la date de fin pour inclure les signatures du jour de fin
+            $endDate->modify('+1 day');
+
+            $signatureQuery->andWhere('s.createAt >= :startDate')
+                ->andWhere('s.createAt < :endDate')
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate);
+        }
+
+        if ($nom) {
+            $signatureQuery->andWhere('LOWER(s.name) LIKE LOWER(:nom)')
+                ->setParameter('nom', '%' . $nom . '%');
+        }
+
+        if ($poste) {
+            $signatureQuery->andWhere('LOWER(s.role) LIKE LOWER(:poste)')
+                ->setParameter('poste', '%' . $poste . '%');
+        }
+
+        $allSignatureQuery = $signatureQuery->getQuery();
+
         // Paginer les signatures
         /** @var PaginationInterface|SlidingPagination $pagination */
         $pagination = $paginator->paginate(
@@ -171,11 +198,22 @@ class SignatureGeneratorController extends AbstractController
             $itemsPerPage
         );
 
+        return $this->render('signature/generate_signature.html.twig', [
+            'form' => $form->createView(),
+            'signature' => $generatedSignature,
+            'pagination' => $pagination,
+            'date' => $date,
+            'nom' => $nom,
+            'poste' => $poste
+        ]);
 
         return $this->render('signature/generate_signature.html.twig', [
             'form' => $form->createView(),
             'signature' => $generatedSignature,
             'pagination' => $pagination,
+            'date' => $date,
+            'nom' => $nom,
+            'poste' => $poste
         ]);
     }
     private function generateEmailSignature(array $data): string
@@ -235,9 +273,9 @@ class SignatureGeneratorController extends AbstractController
     /**
      * @Route("/signature", name="signature")
      */
-    public function getSignature(SignatureRepository $signatureRepository){
+    public function getSignature(SignatureRepository $signatureRepository)
+    {
         $allSignature = $signatureRepository->findAll();
-        return $this->render('signature/generate_signature.html.twig', [
-        ]);        
+        return $this->render('signature/generate_signature.html.twig', []);
     }
 }
