@@ -4,63 +4,116 @@
 {% endblock %}
 
 {% block body %}
-	<a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
 
-	<div class="generateur">
+	<div class="container">
 
-<section class="all_signatures">
+        <div class="d-flex justify-content-end">
+            <a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
+        </div>
+                    {#mettre la modification de motde passe cacher dans un boutton #}
+        <section class="userProfile d-flex justify-content-end">
+            <form class="user-form" method="POST">
+                {{ form_start(userForm) }}<br>
+        
+                <div class="form-group">
+                    {{ form_row(userForm.password, {'attr': {'class': 'form-control'}}) }}
+                </div>
+        
+                {{ form_end(userForm) }}
+                <br>
+            </form>
+        </section><br>
 
-<form method="GET" action="{{ path('profile_signature') }}">
-<div class="form-row">
-    <div class="form-group col-md">
-        <label for="date">Date de création :</label>
-        <input type="date" id="date" name="date" class="form-control" value="{{ date }}">
-    </div>
-    <div class="form-group col-md">
-        <label for="nom">Nom :</label>
-        <input type="text" id="nom" name="nom" class="form-control" value="{{ nom }}">
-    </div>
-    <div class="form-group col-md">
-        <label for="poste">Poste :</label>
-        <input type="text" id="poste" name="poste" class="form-control" value="{{ poste }}">
-    </div>
-</div>
+        <section class="all_signatures">
 
-    <button type="submit" class="btn btn-primary">Rechercher</button>
-</form>
+        <form method="GET" action="{{ path('profile_signature') }}">
+        <div class="form-row">
+            <div class="form-group col-md">
+                <label for="date">Date de création :</label>
+                <input type="date" id="date" name="date" class="form-control" value="{{ date }}">
+            </div>
+            <div class="form-group col-md">
+                <label for="nom">Nom :</label>
+                <input type="text" id="nom" name="nom" class="form-control" value="{{ nom }}">
+            </div>
+            <div class="form-group col-md">
+                <label for="email">Email :</label>
+                <input type="text" id="email" name="email" class="form-control" value="{{ email }}">
+            </div>
+        </div>
 
-   <table class="table">
-      <thead>
-         <tr>
-            <th>Nom et Prénom</th>
-            <th>Poste</th>
-            <th>Date de création</th>
-            <th>Actions</th>
-         </tr>
-      </thead>
-      <tbody>
-         {% for signature in pagination %}
-         <tr>
-            <td>{{ signature.name }}</td>
-            <td>{{ signature.role }}</td>
-            <td>{{ signature.createAT|date('d-m-Y H:i') }}</td>
-            <td>
-               <button class="btn btn-warning" onclick="">Éditer</button>
-               <button class="btn btn-secondary" onclick="">HTML</button>
-               <button class="btn btn-success" onclick="">PNG</button>
-            </td>
-         </tr>
-         {% endfor %}
-      </tbody>
-   </table>
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </form><br>
 
-   {# Afficher les liens de pagination #}
-    <div class="pagination">
-    	{{ knp_pagination_render(pagination) }}
-	</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom et Prénom</th>
+                    <th>Adresse email</th>
+                    <th>Date de création</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signature in pagination %}
+                <tr>
+                    <td>
+                        <section class="view_signature d-flex justify-content-center align-items-center mt-5">
+                                <table class="w-100">
+                                        <tr>
+                                            <td class="align-middle" style="inline-size: 10%;">
+                                                <p>
+                                                    <a href="https://www.unsa.org/"><img id="logo" src="{{signature.logo.path}}" class="border-0" style="inline-size: 120px;" alt="LOGO UNSA"></a>
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex;">
+                                                    <div style="flex-grow: 1;">
+                                                        <p>
+                                                            <span id="name" class="font-weight-bold">{{signature.name}}</span><br>
+                                                            <span id="role"><i>{{signature.role}}</i></span><br>
+                                                            <span id="organization"><i>{{signature.organization}}</i></span><br>
+                                                        </p>
+                                                        <p>
+                                                            <span id="address">{{signature.adress}}</span><br>
+                                                            <span id="zipCode">{{signature.zipCode}}&nbsp;</span>
+                                                            <span id="city">{{signature.city}} CEDEX</span><br>
+                                                        </p>
+                                                        <p>
+                                                            <img src="https://reseaux.unsa.org/signature/_mail.svg" class="border-0" style="block-size: 12px; margin-inline-end: .5em;">
+                                                            <a id="email" href="mailto:${email}" style="color: #666; font-style: italic;">{{signature.email}}</a><br>
+                                                            <img src="https://reseaux.unsa.org/signature/_phone.svg" class="border-0" style="block-size: 14px; margin-inline-end: .5em;">
+                                                            <span id="phone" style="color: #666;">{{signature.phone}}</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                </table>
+                        </section>
+                    </td>
+                    <td class="text-center align-middle">{{ signature.email }}</td>
+                    <td class="text-center align-middle">{{ signature.createAT|date('d-m-Y H:i') }}</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-warning" onclick="">Éditer</button>
+                    </td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-secondary" onclick="">HTML</button>
+                    </td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-success" onclick="">PNG</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-</section>
+        {# Afficher les liens de pagination #}
+            <div class="pagination">
+                {{ knp_pagination_render(pagination) }}
+            </div>
 
+        </section><br>
 
 		<section class="generate_signature" style="inline-size: 33%; float: inline-start;">
 
@@ -95,49 +148,43 @@
 				<div class="form-group">
 					{{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo', 'oninput': 'updatePreview()'}}) }}
 				</div>
-				{# Ajouter du JavaScript ici pour afficher les images #}
-				<button type="submit" class="btn btn-primary">Générer</button>
 				{{ form_end(form) }}
 			</form>
-		</section>
+		</section><br>
 
-		<section class="view_signature" style="inline-size: 60%; float: inline-end; padding-block-start: 12%;">
-			<div class="prévisualisation" style="border: solid;">
-				<table border="0" cellpadding="0" width="500">
-					<tbody>
-						<tr>
-							<td align="left" valign="middle" width="10">
-								<p>
-									<a href="https://www.unsa.org/"><img id="logo" src="source du logo"  style="border:none;inline-size:120px; " alt="LOGO UNSA"></a>
-								</p>
-							</td>
-							<td>
-								<p>
-									<span id="name">Nom et Prénom</span><br>
-									<span id="role">
-										<i>Mon poste</i>
-									</span><br>
-									<span id="organization">
-										<i>Mon entreprise</i>
-									</span><br>
-								</p>
-								<p>
-									<span id="address">Mon adresse</span><br>
-									<span id="zipCode">Code postal&nbsp;</span>
-									<span id="city">Ville CEDEX</span><br>
-								</p>
-								<p>
-									<img src="https://reseaux.unsa.org/signature/_mail.svg" style="border: none;block-size: 12px;margin-inline-end: .5em;">
-									<a id="email" href="mailto:${email}" style="color: #666;font-style: italic;">Adresse Email</a><br>
-									<img src="https://reseaux.unsa.org/signature/_phone.svg" style="border: none;block-size: 14px;margin-inline-end: .5em;">
-									<span id="phone" style="color: #666;">Numéro</span>
-								</p>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</section>
+        <section class="view_signature d-flex justify-content-center align-items-center mt-5">
+            <div class="border p-3">
+                <table class="w-100">
+                    <tbody>
+                        <tr>
+                            <td class="align-middle" style="inline-size: 10%;">
+                                <p>
+                                    <a href="https://www.unsa.org/"><img id="logo" src="source du logo" class="border-0" style="inline-size: 120px;" alt="LOGO UNSA"></a>
+                                </p>
+                            </td>
+                            <td>
+                                <p>
+                                    <span id="name" class="font-weight-bold">Nom et Prénom</span><br>
+                                    <span id="role"><i>Mon poste</i></span><br>
+                                    <span id="organization"><i>Mon entreprise</i></span><br>
+                                </p>
+                                <p>
+                                    <span id="address">Mon adresse</span><br>
+                                    <span id="zipCode">Code postal&nbsp;</span>
+                                    <span id="city">Ville CEDEX</span><br>
+                                </p>
+                                <p>
+                                    <img src="https://reseaux.unsa.org/signature/_mail.svg" class="border-0" style="block-size: 12px; margin-inline-end: .5em;">
+                                    <a id="email" href="mailto:${email}" style="color: #666; font-style: italic;">Adresse Email</a><br>
+                                    <img src="https://reseaux.unsa.org/signature/_phone.svg" class="border-0" style="block-size: 14px; margin-inline-end: .5em;">
+                                    <span id="phone" style="color: #666;">Numéro</span>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
 		<div style="inline-size: 50%; float: inline-end; padding-block-start: 5%;">
 			<div class="Modal">
@@ -150,6 +197,7 @@
 
 			</div>
 		</div>
+    </div>
 
 	{% endblock %}
 	{% block javascripts %}

@@ -8,6 +8,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use DateTimeImmutable;
@@ -49,6 +51,7 @@ class SignatureGeneratorController extends AbstractController
             throw $this->createAccessDeniedException('Access Denied');
         }
 
+        $generatedSignature = '';
         $logos = $logoRepository->findAll();
         $logoChoices = [];
 
@@ -117,51 +120,102 @@ class SignatureGeneratorController extends AbstractController
                 'choices' => $logoChoices,
                 'required' => false,
             ])
+            ->add('signatureSubmit', SubmitType::class, [
+                'label' => 'Générer la signature',
+                'attr' => [
+                    'class' => 'btn btn-primary',
+                    'name' => 'signatureSubmit', // Ajout de l'attribut name
+                ],
+            ])
             ->getForm();
 
-        $form->handleRequest($request);
+        $user = $userRepository->find($userId);
 
-        $generatedSignature = '';
+        $userForm = $this->createFormBuilder($user)
+            ->add('password', PasswordType::class, [
+                'label' => 'Nouveau mot de passe : ',
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Nouveau mot de passe',
+                    'class' => 'form-control',
+                ],
+            ])
+            ->add('userSubmit', SubmitType::class, [
+                'label' => 'Modifier le mot de passe',
+                'attr' => [
+                    'class' => 'btn btn-primary',
+                    'name' => 'userSubmit', // Ajout de l'attribut name
+                ],
+            ])
+            ->getForm();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
+        if ($request->isMethod('POST')) {
+            $data = $request->request->all();
 
-            // Créer une instance de l'entité Signature et définir les valeurs des propriétés
-            $signature = new Signature();
-            $signature->setName($data['name']);
-            $signature->setRole($data['role']);
-            $signature->setOrganization($data['organization']);
-            $signature->setAdress($data['adress']);
-            $signature->setZipCode($data['zip_code']);
-            $signature->setCity($data['city']);
-            $signature->setEmail($data['email']);
-            $signature->setPhone($data['phone']);
-            $signature->setLogo($data['logo']);
-            $signature->setUserId($session->get('user_id'));
+            if (isset($data['form']['signatureSubmit'])) {
+                $form->handleRequest($request);
 
-            $createAt = new DateTimeImmutable();
-            $signature->setCreateAt($createAt);
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $data = $form->getData();
 
-            // Définir la date de mise à jour (identique à la date de création initialement)
-            $updateAt = clone $createAt;
-            $signature->setUpdateAt($updateAt);
+                    // Créer une instance de l'entité Signature et définir les valeurs des propriétés
+                    $signature = new Signature();
+                    $signature->setName($data['name']);
+                    $signature->setRole($data['role']);
+                    $signature->setOrganization($data['organization']);
+                    $signature->setAdress($data['adress']);
+                    $signature->setZipCode($data['zip_code']);
+                    $signature->setCity($data['city']);
+                    $signature->setEmail($data['email']);
+                    $signature->setPhone($data['phone']);
+                    $signature->setLogo($data['logo']);
+                    $signature->setUserId($session->get('user_id'));
 
-            // Enregistrer l'entité dans la base de données
-            $entityManager->persist($signature);
-            $entityManager->flush();
+                    $createAt = new DateTimeImmutable();
+                    $signature->setCreateAt($createAt);
 
-            // Générer la signature avec les données fournies
-            $generatedSignature = $this->generateEmailSignature($data);
+                    // Définir la date de mise à jour (identique à la date de création initialement)
+                    $updateAt = clone $createAt;
+                    $signature->setUpdateAt($updateAt);
+
+                    // Enregistrer l'entité dans la base de données
+                    $entityManager->persist($signature);
+                    $entityManager->flush();
+
+                    // Générer la signature avec les données fournies
+                    $generatedSignature = $this->generateEmailSignature($data);
+                }
+            }
+
+            if (isset($data['form']['userSubmit'])) {
+                $userForm->handleRequest($request);
+
+                if ($userForm->isSubmitted() && $userForm->isValid()) {
+                    $password = $userForm->get('password')->getData();
+
+                    // Vérifier si le bouton "userSubmit" a été cliqué
+                    if ($password !== null && $password !== '') {
+                        // Mettre à jour le mot de passe de l'utilisateur
+                        $hashedPassword = hash('sha256', $password);
+                        $user->setPassword($hashedPassword);
+                    }
+                    // Enregistrer l'utilisateur mis à jour dans la base de données
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+                    // Rediriger vers une page de confirmation ou vers le profil de l'utilisateur
+                    $this->addFlash('success', 'Mot de passe changé avec succès');
+                }
+            }
         }
 
         $date = $request->query->get('date');
         $nom = $request->query->get('nom');
-        $poste = $request->query->get('poste');
+        $email = $request->query->get('email');
 
         // Récupérer les signatures de l'utilisateur connecté
         $page = $request->query->getInt('page', 1);
         // Nombre d'éléments par page
-        $itemsPerPage = 7;
+        $itemsPerPage = 5;
 
         // Récupérer toutes les signatures avec les conditions de recherche
         $signatureQuery = $signatureRepository->createQueryBuilder('s');
@@ -183,9 +237,9 @@ class SignatureGeneratorController extends AbstractController
                 ->setParameter('nom', '%' . $nom . '%');
         }
 
-        if ($poste) {
-            $signatureQuery->andWhere('LOWER(s.role) LIKE LOWER(:poste)')
-                ->setParameter('poste', '%' . $poste . '%');
+        if ($email) {
+            $signatureQuery->andWhere('LOWER(s.email) LIKE LOWER(:email)')
+                ->setParameter('email', '%' . $email . '%');
         }
 
         $allSignatureQuery = $signatureQuery->getQuery();
@@ -204,16 +258,8 @@ class SignatureGeneratorController extends AbstractController
             'pagination' => $pagination,
             'date' => $date,
             'nom' => $nom,
-            'poste' => $poste
-        ]);
-
-        return $this->render('signature/generate_signature.html.twig', [
-            'form' => $form->createView(),
-            'signature' => $generatedSignature,
-            'pagination' => $pagination,
-            'date' => $date,
-            'nom' => $nom,
-            'poste' => $poste
+            'email' => $email,
+            'userForm' => $userForm,
         ]);
     }
     private function generateEmailSignature(array $data): string
