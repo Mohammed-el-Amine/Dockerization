@@ -113,7 +113,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/users', name: 'admin_index', methods: ["GET"])]
+    #[Route('/admin-users', name: 'admin_index', methods: ["GET"])]
     /**
      * @Route("/admin/users", name="admin_index", methods={"GET"})
      */
@@ -433,7 +433,7 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/create-signature', name: 'admin_create_signature', methods: ['GET', 'POST'])]
+    #[Route('/admin-create-signature', name: 'admin_create_signature', methods: ['GET', 'POST'])]
     /**
      * @Route("/admin/create-signature", name="admin_create_signature", methods={"GET","POST"})
      */

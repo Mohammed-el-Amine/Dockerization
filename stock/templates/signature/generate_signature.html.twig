@@ -6,23 +6,32 @@
 {% block body %}
 
 	<div class="container"><br>
-<h1>Bienvue sur votre espace personnel {{user.email}}</h1><br>
         <div class="d-flex justify-content-end">
             <a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
         </div>
-                    {#mettre la modification de motde passe cacher dans un boutton #}
-        <section class="userProfile d-flex justify-content-end">
+        
+        <div style="display: flex; justify-content: center;">
+        <div style="display: flex; align-items: center;">
+            <h1 style="text-align: center; margin-inline-end: 10px;">Bienvue sur votre espace personnel {{user.email}} &nbsp;</h1>
+            <section class="userProfile">
             <form class="user-form" method="POST">
-                {{ form_start(userForm) }}<br>
-        
-                <div class="form-group">
-                    {{ form_row(userForm.password, {'attr': {'class': 'form-control'}}) }}
-                </div>
-        
-                {{ form_end(userForm) }}
-                <br>
-            </form>
-        </section><br>
+  {{ form_start(userForm) }}<br>
+
+  <div class="form-group">
+    <div class="input-group">
+      {{ form_row(userForm.password, {'attr': {'class': 'form-control', 'type': 'password'}}) }}
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" id="showPasswordBtn" onclick="togglePasswordVisibility()">Afficher</button>
+      </div>
+    </div>
+  </div>
+
+  {{ form_end(userForm) }}
+  <br>
+</form>
+            </section>
+        </div>
+        </div><br><br>
 
         <section class="all_signatures">
 
@@ -280,9 +289,19 @@
                 previewZipCode.textContent = zipCodeValue;
                 }
 
-//                public function edit(){
-//
-//                }
+            function togglePasswordVisibility() {
+  var passwordField = document.querySelector('input[name="{{ userForm.password.vars.full_name }}"]');
+  var showPasswordBtn = document.getElementById("showPasswordBtn");
+
+  if (passwordField.type === "password") {
+    passwordField.type = "text";
+    showPasswordBtn.textContent = "Cacher";
+  } else {
+    passwordField.type = "password";
+    showPasswordBtn.textContent = "Afficher";
+  }
+
+}
 		</script>
 
 	{% endblock %}

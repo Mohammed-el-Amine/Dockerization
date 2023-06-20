@@ -13,10 +13,10 @@
         <a class="btn btn-outline-info" href="{{ path('admin_index') }}">Utilisateurs</a>
         <a class="btn btn-outline-info" href="{{ path('admin_logo') }}">Logo</a><br><br>
 
+			<h1>Générer une signature</h1><br><br>
+
 		<section class="generate_signature" style="inline-size: 33%; float: inline-start;">
         
-			<h1>Générer une signature</h1>
-
 			<form class="form" method="post">
 				{{ form_start(form) }}
 				<div class="form-group">
@@ -96,7 +96,6 @@
 			</div>
 		</div>
     </div>
-
 	{% endblock %}
 	{% block javascripts %}
 		{{ parent() }}
@@ -181,7 +180,6 @@
                 previewPhone.textContent = phoneValue;
                 previewZipCode.textContent = zipCodeValue;
                 }
-
 		</script>
 
 	{% endblock %}
