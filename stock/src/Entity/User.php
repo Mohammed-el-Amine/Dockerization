@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
@@ -77,4 +78,21 @@ class User
 
         return $this;
     }
+    public function isTokenValid(): bool
+    {
+        $tokenParts = explode('-', $this->token, 3);
+        $token = $tokenParts[0];
+        $tokenCreation = DateTime::createFromFormat('d-m-Y-H-i-s', $tokenParts[2]);
+    
+        if (!$tokenCreation) {
+            return false;
+        }
+    
+        $currentDateTime = new DateTime();
+        $tokenExpiration = clone $tokenCreation;
+        $tokenExpiration->modify('+24 hours');
+    
+        return $currentDateTime <= $tokenExpiration;
+    }
+    
 }

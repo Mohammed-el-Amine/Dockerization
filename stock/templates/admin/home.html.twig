@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  Admin Home
+{% endblock %}
+
+{% block body %}
+  
+    <div class="container">
+    <h1>Admin Dashboard!</h1>
+
+
+    <button type="button" class="btn btn-primary" onclick="goToUsers()">Utilisateurs</button>
+    <div class="d-flex justify-content-end">
+            <a href="{{ path('logout') }}" class="btn btn-danger">Déconnexion</a>
+        </div>
+
+        <section class="all_signatures">
+
+        <form method="GET" action="{{ path('admin_dashboard') }}">
+        <div class="form-row">
+            <div class="form-group col-md">
+                <label for="date">Date de création :</label>
+                <input type="date" id="date" name="date" class="form-control" value="{{ createAt }}">
+            </div>
+            <div class="form-group col-md">
+                <label for="nom">Nom :</label>
+                <input type="text" id="nom" name="nom" class="form-control" value="{{ name }}">
+            </div>
+            <div class="form-group col-md">
+                <label for="email">Email :</label>
+                <input type="text" id="email" name="email" class="form-control" value="{{ mail }}">
+            </div>
+        </div>
+
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </form><br>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom et Prénom</th>
+                    <th>Adresse email</th>
+                    <th>Date de création</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for signature in pagination %}
+                <tr>
+                    <td>
+                        <section class="view_signature d-flex justify-content-center align-items-center mt-5">
+                                <table class="w-100">
+                                        <tr>
+                                            <td class="align-middle" style="inline-size: 10%;">
+                                                <p>
+                                                    <a href="https://www.unsa.org/"><img id="logoEdit" src="{{signature.logo.path}}" class="border-0" style="inline-size: 120px;" alt="LOGO UNSA"></a>
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex;">
+                                                    <div style="flex-grow: 1;">
+                                                        <p>
+                                                            <span id="nameEdit" class="font-weight-bold">{{signature.name}}</span><br>
+                                                            <span id="roleEdit"><i>{{signature.role}}</i></span><br>
+                                                            <span id="organizationEdit"><i>{{signature.organization}}</i></span><br>
+                                                        </p>
+                                                        <p>
+                                                            <span id="addressEdit">{{signature.adress}}</span><br>
+                                                            <span id="zipCodeEdit">{{signature.zipCode}}&nbsp;</span>
+                                                            <span id="cityEdit">{{signature.city}} CEDEX</span><br>
+                                                        </p>
+                                                        <p>
+                                                            <img src="https://reseaux.unsa.org/signature/_mail.svg" class="border-0" style="block-size: 12px; margin-inline-end: .5em;">
+                                                            <a id="emailEdit" href="mailto:${email}" style="color: #666; font-style: italic;">{{signature.email}}</a><br>
+                                                            <img src="https://reseaux.unsa.org/signature/_phone.svg" class="border-0" style="block-size: 14px; margin-inline-end: .5em;">
+                                                            <span id="phoneEdit" style="color: #666;">{{signature.phone}}</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                </table>
+                        </section>
+                    </td>
+                    <td class="text-center align-middle">{{ signature.email }}</td>
+                    <td class="text-center align-middle">{{ signature.createAT|date('d-m-Y H:i') }}</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-warning" onclick="edit()">Éditer</button>
+                    </td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-secondary" onclick="">HTML</button>
+                    </td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-success" onclick="">PNG</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {# Afficher les liens de pagination #}
+            <div class="pagination">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+
+        </section><br>
+        </div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    function goToUsers() {
+      window.location.href = "{{ path('admin_index') }}"
+    }
+    
+    function logout() {
+      window.location.href = "{{ path('logout') }}"
+    }
+  </script>
+{% endblock %}

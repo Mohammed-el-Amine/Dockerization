@@ -48,8 +48,8 @@ class HomeController extends AbstractController
 
                     $role = $user->getRole();
                     if ($role === "admin") {
-                        // return $this->redirectToRoute('admin_dashboard');
-                        $this->addFlash('success', 'admin');
+                        return $this->redirectToRoute('admin_dashboard');
+                        // $this->addFlash('success', 'admin');
                     } else if ($role === 'utilisateur') {
                         return $this->redirectToRoute('profile_signature');
                         // $this->addFlash('success', 'utilisateur');

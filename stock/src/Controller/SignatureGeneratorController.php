@@ -12,7 +12,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use DateTimeImmutable;
 use App\Entity\Logo;
 use App\Entity\Signature;
 use App\Repository\UserRepository;
@@ -25,7 +24,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Knp\Component\Pager\PaginatorInterface;
 use Knp\Component\Pager\Pagination\SlidingPagination;
 use Knp\Component\Pager\Pagination\PaginationInterface;
-
+use DateTimeImmutable;
 
 class SignatureGeneratorController extends AbstractController
 {
@@ -133,7 +132,7 @@ class SignatureGeneratorController extends AbstractController
 
         $userForm = $this->createFormBuilder($user)
             ->add('password', PasswordType::class, [
-                'label' => 'Nouveau mot de passe : ',
+                'label' => 'Vous souhaitez changez de mot de passe ?',
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'Nouveau mot de passe',
@@ -157,7 +156,6 @@ class SignatureGeneratorController extends AbstractController
 
                 if ($form->isSubmitted() && $form->isValid()) {
                     $data = $form->getData();
-
                     // Créer une instance de l'entité Signature et définir les valeurs des propriétés
                     $signature = new Signature();
                     $signature->setName($data['name']);
@@ -170,18 +168,15 @@ class SignatureGeneratorController extends AbstractController
                     $signature->setPhone($data['phone']);
                     $signature->setLogo($data['logo']);
                     $signature->setUserId($session->get('user_id'));
-
+                    // Définir la date de création
                     $createAt = new DateTimeImmutable();
                     $signature->setCreateAt($createAt);
-
                     // Définir la date de mise à jour (identique à la date de création initialement)
                     $updateAt = clone $createAt;
                     $signature->setUpdateAt($updateAt);
-
                     // Enregistrer l'entité dans la base de données
                     $entityManager->persist($signature);
                     $entityManager->flush();
-
                     // Générer la signature avec les données fournies
                     $generatedSignature = $this->generateEmailSignature($data);
                 }
@@ -192,7 +187,6 @@ class SignatureGeneratorController extends AbstractController
 
                 if ($userForm->isSubmitted() && $userForm->isValid()) {
                     $password = $userForm->get('password')->getData();
-
                     // Vérifier si le bouton "userSubmit" a été cliqué
                     if ($password !== null && $password !== '') {
                         // Mettre à jour le mot de passe de l'utilisateur
@@ -211,12 +205,10 @@ class SignatureGeneratorController extends AbstractController
         $date = $request->query->get('date');
         $nom = $request->query->get('nom');
         $email = $request->query->get('email');
-
         // Récupérer les signatures de l'utilisateur connecté
         $page = $request->query->getInt('page', 1);
         // Nombre d'éléments par page
         $itemsPerPage = 5;
-
         // Récupérer toutes les signatures avec les conditions de recherche
         $signatureQuery = $signatureRepository->createQueryBuilder('s');
 
@@ -251,7 +243,7 @@ class SignatureGeneratorController extends AbstractController
             $page,
             $itemsPerPage
         );
-
+        
         return $this->render('signature/generate_signature.html.twig', [
             'form' => $form->createView(),
             'signature' => $generatedSignature,
@@ -260,6 +252,7 @@ class SignatureGeneratorController extends AbstractController
             'nom' => $nom,
             'email' => $email,
             'userForm' => $userForm,
+            'user' => $user,
         ]);
     }
     private function generateEmailSignature(array $data): string
