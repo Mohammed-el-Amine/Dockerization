@@ -21,11 +21,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mailgun\Mailgun;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use DateTime;
+use App\Entity\Logo;
 
 class AdminController extends AbstractController
 {
@@ -108,6 +112,9 @@ class AdminController extends AbstractController
     }
 
     #[Route('/admin/users', name: 'admin_index', methods: ["GET"])]
+    /**
+     * @Route("/admin/users", name="admin_index", methods={"GET"})
+     */
     public function index(UserRepository $userRepository, SessionInterface $session, UrlGeneratorInterface $urlGenerator)
     {
         if (!$session->has('user_id')) {
@@ -290,5 +297,150 @@ class AdminController extends AbstractController
             'form' => $form->createView(),
             'user' => $user
         ]);
+    }
+
+    #[Route('/admin/user/edit/{id}', name: 'utilisateur_edit', methods: ['GET', 'POST'])]
+    /**
+     * @Route("/admin/user/edit/{id}", name="utilisateur_edit", methods={"GET","POST"})
+     */
+    public function edit(User $editUser, Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
+    {
+        if (!$session->has('user_id')) {
+            return new RedirectResponse($urlGenerator->generate('app_home'));
+        }
+
+        $userId = $session->get('user_id');
+
+        if ($userId) {
+            $currentUser = $userRepository->find($userId);
+
+            if ($currentUser && $currentUser->getRole() !== 'admin') {
+                throw $this->createAccessDeniedException('Access Denied');
+            }
+        } else {
+            throw $this->createAccessDeniedException('Access Denied');
+        }
+
+        $currentEmail = $editUser->getEmail();
+        $currentRole = $editUser->getRole();
+        $currentPassword = $editUser->getPassword();
+
+        $form = $this->createFormBuilder($editUser)
+            ->add('email', EmailType::class, [
+                'data' => $currentEmail,
+            ])
+            ->add('password', PasswordType::class, [
+                'required' => false,
+                'empty_data' => '',
+            ])
+            ->add('role', ChoiceType::class, [
+                'choices' => [
+                    'Admin' => 'admin',
+                    'Utilisateur' => 'utilisateur',
+                ],
+                'data' => $currentRole,
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $editUser->setEmail($currentEmail);
+            $editUser->setRole($currentRole);
+
+            $newRole = $form->get('role')->getData();
+            $editUser->setRole($newRole);
+
+            $newPassword = $editUser->getPassword();
+
+            if (!empty($newPassword)) {
+                $hashedPassword = hash('sha256', $newPassword);
+                $editUser->setPassword($hashedPassword);
+            } else {
+                // Aucun nouveau mot de passe fourni, on ne l'actualise pas
+                $editUser->setPassword($currentPassword);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'L\'enregistrement a été effectué avec succès.');
+        }
+        return $this->render('admin/edit.html.twig', [
+            'form' => $form->createView(),
+            'user' => $editUser,
+        ]);
+    }
+
+    #[Route('/admin-logo', name: 'admin_logo', methods: ['GET', 'POST'])]
+    /**
+     * @Route("/admin/logo", name="admin_logo", methods={"GET","POST"})
+     */
+    public function logo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
+    {
+        if (!$session->has('user_id')) {
+            return new RedirectResponse($urlGenerator->generate('app_home'));
+        }
+        $userId = $session->get('user_id');
+
+        if ($userId) {
+            $currentUser = $userRepository->find($userId);
+
+            if ($currentUser && $currentUser->getRole() !== 'admin') {
+                throw $this->createAccessDeniedException('Access Denied');
+            }
+        } else {
+            throw $this->createAccessDeniedException('Access Denied');
+        }
+        $currentDateTime = new \DateTimeImmutable();
+
+        $logo = new Logo();
+        $logo->setCreateAt($currentDateTime);
+        $logo->setUpdateAt($currentDateTime);
+        
+        $form = $this->createFormBuilder($logo)
+            ->add('name', TextType::class, [
+                'label' => 'Nom :',
+                'required' => true,
+                'attr' => ['placeholder' => 'Nom du logo'],
+
+            ])
+            ->add('path', TextType::class, [
+                'label' => 'Chemin du logo :',
+                'required' => true,
+                'attr' => ['placeholder' => '/path/to/logo.png'],
+
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Ajouter',
+                'attr' => ['class' => 'btn btn-primary'],
+            ])
+            ->getForm();
+
+            $form->handleRequest($request);
+    
+            if ($form->isSubmitted() && $form->isValid()) {
+                $entityManager->persist($logo);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Le logo a été ajouté avec succès.');
+                return $this->redirectToRoute('admin_logo');
+            }
+
+            $logoRepository = $entityManager->getRepository(Logo::class);
+            $logos = $logoRepository->findAll();
+            
+            return $this->render('admin/logo.html.twig', [
+                'form' => $form->createView(),
+                'logos' => $logos,
+            ]);
+    }
+
+    #[Route('/admin/create-signature', name: 'admin_create_signature', methods: ['GET', 'POST'])]
+    /**
+     * @Route("/admin/create-signature", name="admin_create_signature", methods={"GET","POST"})
+     */
+    public function createSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
+    {
+        
     }
 }

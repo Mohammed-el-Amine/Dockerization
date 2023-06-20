@@ -45,8 +45,8 @@
             <button type="submit" class="btn btn-primary">Rechercher</button>
         </form><br>
 
-        <table class="table">
-            <thead>
+        <table class="table border">
+            <thead class="table-dark">
                 <tr>
                     <th>Nom et Prénom</th>
                     <th>Adresse email</th>
@@ -95,13 +95,9 @@
                     <td class="text-center align-middle">{{ signature.email }}</td>
                     <td class="text-center align-middle">{{ signature.createAT|date('d-m-Y H:i') }}</td>
                     <td class="text-center align-middle">
-                        <button class="btn btn-warning" onclick="edit()">Éditer</button>
-                    </td>
-                    <td class="text-center align-middle">
-                        <button class="btn btn-secondary" onclick="">HTML</button>
-                    </td>
-                    <td class="text-center align-middle">
-                        <button class="btn btn-success" onclick="">PNG</button>
+                            <button class="btn btn-warning" onclick="edit()">Éditer</button>
+                            <button class="btn btn-secondary" onclick="">HTML</button>
+                            <button class="btn btn-success" onclick="">PNG</button>
                     </td>
                 </tr>
                 {% endfor %}
