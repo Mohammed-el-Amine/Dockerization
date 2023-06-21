@@ -346,6 +346,8 @@ class AdminController extends AbstractController
             $editUser->setEmail($currentEmail);
             $editUser->setRole($currentRole);
 
+            $newEmail = $form->get('email')->getData();
+            $editUser->setEmail($newEmail);
             $newRole = $form->get('role')->getData();
             $editUser->setRole($newRole);
 
@@ -585,7 +587,7 @@ class AdminController extends AbstractController
         $html .= '<tr>';
         $html .= '<td align="left" valign="middle" width="10">';
         $html .= '<p style="padding-inline-end: 10px;font-size: 12px;line-height: 14px;">';
-        $html .= '<a href="https://www.unsa.org"><img src="' . $data['logo']->getPath() . '" style="border: none;inline-size: 120px;"></a>';
+        $html .= '<a href="https://www.unsa.org"><img id="LOGO"src="' . $data['logo']->getPath() . '" style="border: none;inline-size: 120px;"></a>';
         $html .= '</p>';
         $html .= '</td>';
         $html .= '<td>';
