@@ -32,6 +32,7 @@ use App\Entity\Signature;
 use DateTime;
 use DateTimeImmutable;
 use App\Entity\Logo;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class AdminController extends AbstractController
 {
@@ -404,10 +405,9 @@ class AdminController extends AbstractController
                 'attr' => ['placeholder' => 'Nom du logo'],
 
             ])
-            ->add('path', TextType::class, [
+            ->add('path', FileType::class, [
                 'label' => 'Chemin du logo :',
                 'required' => true,
-                'attr' => ['placeholder' => '/path/to/logo.png'],
 
             ])
             ->add('submit', SubmitType::class, [
