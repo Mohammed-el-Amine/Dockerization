@@ -125,10 +125,13 @@
 			<h1>Générer une signature</h1>
 
 			<form class="form" method="post">
-				{{ form_start(form) }}
-				<div class="form-group">
-					{{ form_row(form.name, {'attr': {'class': 'form-control', 'id': 'form_name', 'oninput': 'updatePreview()'}}) }}
-				</div>
+				{{ form_start(form) }}		
+                <div class="form-group">
+                    {{ form_row(form.last_name, {'attr': {'class': 'form-control', 'id': 'form_last_name', 'oninput': 'updatePreview()'}}) }}
+                </div>
+                <div class="form-group">
+                    {{ form_row(form.first_name, {'attr': {'class': 'form-control', 'id': 'form_first_name', 'oninput': 'updatePreview()'}}) }}
+                </div>
 				<div class="form-group">
 					{{ form_row(form.email, {'attr': {'class': 'form-control', 'id': 'form_email', 'oninput': 'updatePreview()'}}) }}
 				</div>
@@ -204,7 +207,8 @@
 		</div>
     </div>
 
-	{% endblock %}
+	{% endblock %}               
+
 	{% block javascripts %}
 		{{ parent() }}
 
@@ -212,17 +216,24 @@
 
             function DownloadHTML() {
                 // Récupère le nom de la personne
-                var name = document.getElementById('form_name').value;
+                var firstNameValue = document.getElementById('form_first_name').value;
+                var lastNameValue = document.getElementById('form_last_name').value;
+                var fullName = firstNameValue + ' ' + lastNameValue;
+
                 // Récupère le contenu de la div signature
                 var element = document.getElementById('signature').innerHTML;
                 
                 var updatedElement = element.replace(/(<img id="LOGO" src=")([^"]+)(" style="border: none;inline-size: 120px;">)/, '$1https://raw.githubusercontent.com/Mohammed-el-Amine/Dockerization/Amine/stock/public$2$3');
+
+                var updatedElementSecond = updatedElement.replace(/(<img id="LOGO-PHONE" src=")([^"]+)(" style="border: none;block-size: 14px;margin-inline-end: .5em;">)/, '$1https://raw.githubusercontent.com/Mohammed-el-Amine/Dockerization/Amine/stock/public$2$3');
+
+                var updatedElementThird = updatedElementSecond.replace(/(<img id="LOGO-MAIL" src=")([^"]+)(" style="border: none;block-size: 12px;margin-inline-end: .5em;">)/, '$1https://raw.githubusercontent.com/Mohammed-el-Amine/Dockerization/Amine/stock/public$2$3');
             
                 // Crée un fichier HTML avec le nom de la personne
-                var filename = name + '.html';
+                var filename = fullName + '.html';
                 // Crée et ajoute un lien de téléchargement
                 var link = document.createElement('a');
-                link.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(updatedElement));
+                link.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(updatedElementThird));
                 // Ajoute le nom du fichier
                 link.setAttribute('download', filename);
                 link.style.display = 'none';
@@ -233,7 +244,10 @@
 
 			function DownloadPNG() {	
 			    // Récupère le nom de la personne
-			    var name = document.getElementById('form_name').value;
+                var firstNameValue = document.getElementById('form_first_name').value;
+                var lastNameValue = document.getElementById('form_last_name').value;
+			    var fullName = firstNameValue + ' ' + lastNameValue;
+
 			    // Récupère l'élément de la signature
 			    var element = document.getElementById('signature');
 			
@@ -245,7 +259,7 @@
 			      // Crée et ajoute un lien de téléchargement
 			      var link = document.createElement('a');
 			      link.href = dataURL;
-			      link.download = name + '.png';
+			      link.download = fullName + '.png';
 			      link.style.display = 'none';
 			
 			      document.body.appendChild(link);
@@ -267,7 +281,8 @@
                 var previewPhone = document.getElementById('phone');
 
                 // Sélectionnez la valeur du champ "name"
-                var nameValue = document.getElementById('form_name').value;
+                var firstNameValue = document.getElementById('form_first_name').value;
+                var lastNameValue = document.getElementById('form_last_name').value;
                 var emailValue = document.getElementById('form_email').value;
                 var logoSelect = document.getElementById('form_logo');
                 var selectedOption = logoSelect.options[logoSelect.selectedIndex];
@@ -280,8 +295,8 @@
                 var zipCodeValue = document.getElementById('form_zip_code').value;
 
                 // Mettez à jour le contenu de la prévisualisation avec la valeur du champ "name"
-                previewName.textContent = nameValue;
-                console.log(emailValue);
+                var fullName = firstNameValue + ' ' + lastNameValue;
+                previewName.textContent = fullName;
                 previewEmail.innerHTML = emailValue;
                 previewLogo.src = logoValue;
                 previewOrganization.textContent = organizationValue;

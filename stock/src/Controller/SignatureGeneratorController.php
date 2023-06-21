@@ -61,10 +61,16 @@ class SignatureGeneratorController extends AbstractController
         }
 
         $form = $this->createFormBuilder()
-            ->add('name', TextType::class, [
-                'label' => 'Nom et Prénom : ',
+            ->add('first_name', TextType::class, [
+                'label' => 'Prénom : ',
                 'attr' => [
-                    'placeholder' => 'Nom et Prénom',
+                    'placeholder' => 'Prénom',
+                ],
+            ])
+            ->add('last_name', TextType::class, [
+                'label' => 'Nom : ',
+                'attr' => [
+                    'placeholder' => 'Nom',
                 ],
             ])
             ->add('role', TextType::class, [
@@ -158,7 +164,7 @@ class SignatureGeneratorController extends AbstractController
                     $data = $form->getData();
                     // Créer une instance de l'entité Signature et définir les valeurs des propriétés
                     $signature = new Signature();
-                    $signature->setName($data['name']);
+                    $signature->setName($data['first_name'] . ' ' . $data['last_name']);
                     $signature->setRole($data['role']);
                     $signature->setOrganization($data['organization']);
                     $signature->setAdress($data['adress']);
@@ -243,7 +249,7 @@ class SignatureGeneratorController extends AbstractController
             $page,
             $itemsPerPage
         );
-        
+
         return $this->render('signature/generate_signature.html.twig', [
             'form' => $form->createView(),
             'signature' => $generatedSignature,
@@ -274,7 +280,7 @@ class SignatureGeneratorController extends AbstractController
         $html .= '</td>';
         $html .= '<td>';
         $html .= '<p style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;font-size: 12px; line-height: 14px; color: #000;text-align: start;">';
-        $html .= '<span style="color: #000;font-weight: bold;font-size: 14px;">' . $data['name'] . '</span><br>';
+        $html .= '<span style="color: #000;font-weight: bold;font-size: 14px;">' . $data['first_name'] . ' ' . $data['last_name'] . '</span><br>';
         $html .= '<span style="color: #666;"><i>' . $data['role'] . '</i></span><br>';
         $html .= '<span style="color: #666;"><i>' . $data['organization'] . '</i></span><br>';
         $html .= '</p>';

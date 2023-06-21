@@ -195,7 +195,6 @@
       modalTitle.textContent = title
       modalBody.innerHTML = '<iframe src="' + url + '" style="inline-size:100%; block-size:100%; border:none;"></iframe>'
     
-      // Afficher la modal
       modal.style.display = 'block'
     }
     
@@ -204,12 +203,11 @@
       var modalTitle = modal.querySelector('.modal-title')
       var modalBody = modal.querySelector('.modal-body')
     
-      // Réinitialiser modal
       modalTitle.textContent = ''
       modalBody.innerHTML = ''
     
-      // Fermer modal
       modal.style.display = 'none'
+      window.location.reload()
     }
     
     function logout() {
