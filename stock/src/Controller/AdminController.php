@@ -33,6 +33,10 @@ use DateTime;
 use DateTimeImmutable;
 use App\Entity\Logo;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AdminController extends AbstractController
 {
@@ -372,11 +376,27 @@ class AdminController extends AbstractController
         ]);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     #[Route('/admin-logo', name: 'admin_logo', methods: ['GET', 'POST'])]
     /**
      * @Route("/admin/logo", name="admin_logo", methods={"GET","POST"})
      */
-    public function logo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
+    public function logo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator, SluggerInterface $slugger)
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
@@ -392,7 +412,7 @@ class AdminController extends AbstractController
         } else {
             throw $this->createAccessDeniedException('Access Denied');
         }
-        $currentDateTime = new \DateTimeImmutable();
+        $currentDateTime = new DateTimeImmutable();
 
         $logo = new Logo();
         $logo->setCreateAt($currentDateTime);
@@ -408,8 +428,17 @@ class AdminController extends AbstractController
             ->add('path', FileType::class, [
                 'label' => 'Chemin du logo :',
                 'required' => true,
-
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1M',
+                        'mimeTypes' => [
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PNG valide.',
+                    ]),
+                ],
             ])
+
             ->add('submit', SubmitType::class, [
                 'label' => 'Ajouter',
                 'attr' => ['class' => 'btn btn-primary'],
@@ -419,6 +448,23 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $uploadedFile */
+            $uploadedFile = $form->get('path')->getData();
+
+            // Générer un nom de fichier unique
+            // Utiliser le nom donné dans le formulaire
+            $filename = $form->get('name')->getData() . '.png';
+
+            // Déplacer le fichier vers le répertoire public/img
+            $uploadedFile->move(
+                $this->getParameter('kernel.project_dir') . '/public/img',
+                $filename
+            );
+
+            // Enregistrer le nom du fichier dans l'entité Logo
+            $logo->setPath($filename);
+
+
             $entityManager->persist($logo);
             $entityManager->flush();
 
@@ -434,6 +480,26 @@ class AdminController extends AbstractController
             'logos' => $logos,
         ]);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     #[Route('/admin-create-signature', name: 'admin_create_signature', methods: ['GET', 'POST'])]
     /**
