@@ -34,9 +34,12 @@ use DateTimeImmutable;
 use App\Entity\Logo;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\File;
-
+use Symfony\Component\Form\Extension\Core\DataTransformer\FileTransformer;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class AdminController extends AbstractController
 {
@@ -376,27 +379,11 @@ class AdminController extends AbstractController
         ]);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     #[Route('/admin-logo', name: 'admin_logo', methods: ['GET', 'POST'])]
     /**
      * @Route("/admin/logo", name="admin_logo", methods={"GET","POST"})
      */
-    public function logo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator, SluggerInterface $slugger)
+    public function logo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator)
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
@@ -412,6 +399,7 @@ class AdminController extends AbstractController
         } else {
             throw $this->createAccessDeniedException('Access Denied');
         }
+
         $currentDateTime = new DateTimeImmutable();
 
         $logo = new Logo();
@@ -438,7 +426,6 @@ class AdminController extends AbstractController
                     ]),
                 ],
             ])
-
             ->add('submit', SubmitType::class, [
                 'label' => 'Ajouter',
                 'attr' => ['class' => 'btn btn-primary'],
@@ -453,7 +440,7 @@ class AdminController extends AbstractController
 
             // Générer un nom de fichier unique
             // Utiliser le nom donné dans le formulaire
-            $filename = $form->get('name')->getData() . '.png';
+            $filename = '/img/' . $form->get('name')->getData() . '.png';
 
             // Déplacer le fichier vers le répertoire public/img
             $uploadedFile->move(
@@ -461,9 +448,7 @@ class AdminController extends AbstractController
                 $filename
             );
 
-            // Enregistrer le nom du fichier dans l'entité Logo
             $logo->setPath($filename);
-
 
             $entityManager->persist($logo);
             $entityManager->flush();
@@ -480,6 +465,140 @@ class AdminController extends AbstractController
             'logos' => $logos,
         ]);
     }
+
+
+    #[Route('/admin/logo/{id}/edit', name: 'admin_logo_edit', methods: ['GET', 'POST'])]
+    /**
+     * @Route("/admin/logo/{id}/edit", name="admin_logo_edit", methods={"GET","POST"})
+     */
+    public function editLogo(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator, $id)
+{
+        if (!$session->has('user_id')) {
+            return new RedirectResponse($urlGenerator->generate('app_home'));
+        }
+        $userId = $session->get('user_id');
+    
+        if ($userId) {
+            $currentUser = $userRepository->find($userId);
+    
+            if ($currentUser && $currentUser->getRole() !== 'admin') {
+                throw $this->createAccessDeniedException('Access Denied');
+            }
+        } else {
+            throw $this->createAccessDeniedException('Access Denied');
+        }
+    
+        $logo = $entityManager->getRepository(Logo::class)->find($id);
+    
+        if (!$logo) {
+            throw $this->createNotFoundException('Aucun logo trouvé ');
+        }
+
+        $currentDateTime = new DateTimeImmutable();
+
+        $newLogo = new Logo();
+        $newLogo->setCreateAt($currentDateTime);
+        $newLogo->setUpdateAt($currentDateTime);
+
+        $form = $this->createFormBuilder($newLogo)
+            ->add('name', TextType::class, [
+                'label' => 'Nom :',
+                'required' => true,
+                'attr' => ['placeholder' => 'Nouveau nom de logo'],
+
+            ])
+            ->add('path', FileType::class, [
+                'label' => 'Chemin du logo :',
+                'required' => true,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1M',
+                        'mimeTypes' => [
+                            'image/png',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez télécharger un fichier PNG valide.',
+                    ]),
+                ],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Ajouter',
+                'attr' => ['class' => 'btn btn-primary'],
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile|null $uploadedFile */
+            $uploadedFile = $form->get('path')->getData();
+        
+            if ($uploadedFile) {
+                $filename = '/img/' . $form->get('name')->getData() . '.png';
+        
+                $uploadedFile->move(
+                    $this->getParameter('kernel.project_dir') . '/public/img',
+                    $filename
+                );
+        
+                $logo->setPath($filename);
+            }
+        
+            $logo->setName($form->get('name')->getData());
+            $logo->setUpdateAt(new \DateTimeImmutable());
+        
+            $entityManager->flush();
+        
+            $this->addFlash('success', 'Le logo a été mis à jour avec succès.');
+            return $this->redirectToRoute('admin_logo');
+        }
+        
+    
+        return $this->render('admin/edit_logo.html.twig', [
+            'logo' => $logo,
+            'form' => $form->createView(),
+        ]);
+    }
+    
+    
+
+
+
+    #[Route('/admin-logo/{id}/delete', name: 'admin_logo_delete', methods: ['GET'])]
+    /**
+     * @Route("/admin/logo/{id}/delete", name="admin_logo_delete", methods={"GET"})
+     */
+    public function deleteLogo(Request $request, EntityManagerInterface $entityManager, Logo $logo): Response
+    {
+        $entityManager->remove($logo);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le logo a été supprimé avec succès.');
+
+        return $this->redirectToRoute('admin_logo');
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
