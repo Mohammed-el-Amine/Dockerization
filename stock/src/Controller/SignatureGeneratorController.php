@@ -109,10 +109,16 @@ class SignatureGeneratorController extends AbstractController
                     'placeholder' => 'Email',
                 ],
             ])
-            ->add('phone', TelType::class, [
-                'label' => 'Téléphone : ',
+            ->add('phone_landline', TelType::class, [
+                'label' => 'Téléphone fixe : ',
                 'attr' => [
-                    'placeholder' => 'Tél',
+                    'placeholder' => 'Tél fixe',
+                ],
+            ])
+            ->add('phone_mobile', TelType::class, [
+                'label' => 'Téléphone portable : ',
+                'attr' => [
+                    'placeholder' => 'Tél portable',
                 ],
             ])
             ->add('logo', EntityType::class, [
@@ -171,7 +177,7 @@ class SignatureGeneratorController extends AbstractController
                     $signature->setZipCode($data['zip_code']);
                     $signature->setCity($data['city']);
                     $signature->setEmail($data['email']);
-                    $signature->setPhone($data['phone']);
+                    $signature->setPhone($data['phone_landline'] . ' - ' . $data['phone_mobile']);
                     $signature->setLogo($data['logo']);
                     $signature->setUserId($session->get('user_id'));
                     // Définir la date de création
@@ -293,7 +299,7 @@ class SignatureGeneratorController extends AbstractController
         $html .= '<img id="LOGO-MAIL" src="/img/mail.png" style="border: none;block-size: 12px;margin-inline-end: .5em;">';
         $html .= '<a href="mailto:' . $data['email'] . '" style="color: #666;font-style: italic;">' . $data['email'] . '</a><br>';
         $html .= '<img id="LOGO-PHONE" src="/img/phone.png" style="border: none;block-size: 14px;margin-inline-end: .5em;">';
-        $html .= '<span style="color: #666;">' . $data['phone'] . '</span>';
+        $html .= '<span style="color: #666;">' . $data['phone_landline'] . ' - ' . $data['phone_mobile'] . '</span>';
         $html .= '</p>';
         $html .= '</td>';
         $html .= '</tr>';
