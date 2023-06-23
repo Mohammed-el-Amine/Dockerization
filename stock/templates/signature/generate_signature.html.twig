@@ -127,49 +127,64 @@
 				{{ knp_pagination_render(pagination) }}
 			</div>
 
-		</section><br>
+		</section><br><hr><br>
+
+		<h1>Générer une signature</h1><br><br>
 
 		<section class="generate_signature" style="inline-size: 33%; float: inline-start;">
 
-			<h1>Générer une signature</h1>
-
 			<form class="form" method="post">
 				{{ form_start(form) }}
-				<div class="form-group">
-					{{ form_row(form.last_name, {'attr': {'class': 'form-control', 'id': 'form_last_name', 'oninput': 'updatePreview()'}}) }}
+
+				<a id="infoPersoBtn" class="btn btn-outline-warning" onclick="toggleInfoPerso()">Information personnelle</a><br><br>
+				<div id="infoPersoFields">
+					<div class="form-group">
+						{{ form_row(form.last_name, {'attr': {'class': 'form-control', 'id': 'form_last_name', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.first_name, {'attr': {'class': 'form-control', 'id': 'form_first_name', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.email, {'attr': {'class': 'form-control', 'id': 'form_email', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.phone_mobile, {'attr': {'class': 'form-control', 'id': 'form_phone_mobile', 'oninput': 'updatePreview()'}}) }}
+					</div>
 				</div>
-				<div class="form-group">
-					{{ form_row(form.first_name, {'attr': {'class': 'form-control', 'id': 'form_first_name', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.email, {'attr': {'class': 'form-control', 'id': 'form_email', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-				    {{ form_row(form.phone_landline, {'attr': {'class': 'form-control', 'id': 'form_phone_landline', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-				    {{ form_row(form.phone_mobile, {'attr': {'class': 'form-control', 'id': 'form_phone_mobile', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.role, {'attr': {'class': 'form-control', 'id': 'form_role', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.organization, {'attr': {'class': 'form-control', 'id': 'form_organization', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.adress, {'attr': {'class': 'form-control', 'id': 'form_address', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.zip_code, {'attr': {'class': 'form-control', 'id': 'form_zip_code', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.city, {'attr': {'class': 'form-control', 'id': 'form_city', 'oninput': 'updatePreview()'}}) }}
-				</div>
-				<div class="form-group">
-					{{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo', 'oninput': 'updatePreview()'}}) }}
+
+				<a id="infoEntrepriseBtn" class="btn btn-outline-warning" onclick="toggleInfoEntreprise()">Information entreprise</a><br>
+				<div id="infoEntrepriseFields">
+
+					<div class="form-group">
+						{{ form_row(form.phone_landline, {'attr': {'class': 'form-control', 'id': 'form_phone_landline', 'oninput': 'updatePreview()'}}) }}
+					</div>
+
+					<div class="form-group">
+						{{ form_row(form.role, {'attr': {'class': 'form-control', 'id': 'form_role', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.organization, {'attr': {'class': 'form-control', 'id': 'form_organization', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.adress, {'attr': {'class': 'form-control', 'id': 'form_address', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.zip_code, {'attr': {'class': 'form-control', 'id': 'form_zip_code', 'oninput': 'updatePreview()'}}) }}
+					</div>
+					<div class="form-group">
+						{{ form_row(form.city, {'attr': {'class': 'form-control', 'id': 'form_city', 'oninput': 'updatePreview()'}}) }}
+					</div>
+				</div><br>
+
+				<a id="infoThemeBtn" class="btn btn-outline-warning" onclick="toggleInfoTheme()">Information theme</a><br><br>
+				<div id="infoThemeFields">
+					<div class="form-group">
+						{{ form_row(form.logo, {'attr': {'class': 'form-control', 'id': 'form_logo', 'oninput': 'updatePreview()'}}) }}
+					</div>
 				</div>
 				{{ form_end(form) }}<br>
 			</form>
+
 		</section><br>
 
 		<section class="view_signature d-flex justify-content-center align-items-center mt-5">
@@ -320,10 +335,8 @@ previewPhone.textContent = phoneLandlineValue + " - " + phoneMobileValue;
 previewZipCode.textContent = zipCodeValue;
 }
 
-window.requestAnimationFrame(updatePreview);
-
 function togglePasswordVisibility() {
-var passwordField = document.querySelector('input[name=" {{ userForm.password.vars.full_name }}"]');
+var passwordField = document.querySelector('input[name="  {{ userForm.password.vars.full_name }}"]');
 var showPasswordBtn = document.getElementById("showPasswordBtn");
 
 if (passwordField.type === "password") {
@@ -335,6 +348,41 @@ showPasswordBtn.textContent = "Afficher";
 }
 
 }
+function toggleInfoPerso() {
+var infoPersoFields = document.getElementById("infoPersoFields");
+var infoPersoBtn = document.getElementById("infoPersoBtn");
+
+if (infoPersoFields.style.display === "none") {
+infoPersoFields.style.display = "block";
+} else {
+infoPersoFields.style.display = "none";
+}
+
+}
+
+function toggleInfoEntreprise() {
+var infoPersoFields = document.getElementById("infoEntrepriseFields");
+var infoPersoBtn = document.getElementById("infoEntrepriseBtn");
+
+if (infoPersoFields.style.display === "none") {
+infoPersoFields.style.display = "block";
+} else {
+infoPersoFields.style.display = "none";
+}
+}
+
+function toggleInfoTheme() {
+var infoPersoFields = document.getElementById("infoThemeFields");
+var infoPersoBtn = document.getElementById("infoThemeBtn");
+
+if (infoPersoFields.style.display === "none") {
+infoPersoFields.style.display = "block";
+} else {
+infoPersoFields.style.display = "none";
+}
+}
+
+window.requestAnimationFrame(updatePreview);
 	</script>
 
 {% endblock %}
