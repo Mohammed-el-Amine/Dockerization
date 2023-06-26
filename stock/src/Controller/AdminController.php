@@ -572,54 +572,11 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('admin_logo');
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     #[Route('/admin-create-signature', name: 'admin_create_signature', methods: ['GET', 'POST'])]
     /**
      * @Route("/admin/create-signature", name="admin_create_signature", methods={"GET","POST"})
      */
-    public function createSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator, LogoRepository $logoRepository,)
+    public function createSignature(Request $request, EntityManagerInterface $entityManager, SessionInterface $session, UserRepository $userRepository, UrlGeneratorInterface $urlGenerator, LogoRepository $logoRepository)
     {
         if (!$session->has('user_id')) {
             return new RedirectResponse($urlGenerator->generate('app_home'));
